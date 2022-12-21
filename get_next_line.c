@@ -6,7 +6,7 @@
 /*   By: junheeki <junheeki@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/24 13:58:17 by junheeki          #+#    #+#             */
-/*   Updated: 2022/12/01 11:20:58 by junheeki         ###   ########.fr       */
+/*   Updated: 2022/12/19 16:04:54 by junheeki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,10 @@ static char	*ft_read_line(int fd, char *buf, char *backup)
 	count = 1;
 	while (count)
 	{
-		count = read(fd, buf, BUFFER_SIZE); // read fd number of Buffer size,	if it works return Number of Bytes, failed return -1,	reached EOF return 0
-		if (count == -1) //읽어온 바이트 수 실패시 -1
+		count = read(fd, buf, BUFFER_SIZE);
+		if (count == -1)
 			return (0);
-		else if (count == 0) // 더이상 읽을 바이트가 없다.
+		else if (count == 0)
 			break ;
 		buf[count] = '\0';
 		if (!backup)
@@ -40,7 +40,7 @@ static char	*ft_read_line(int fd, char *buf, char *backup)
 	return (backup);
 }
 
-static char	*ft_extract(char *line)	//1.Check \n position. 2. If you find EOF, then return 0, 3. After \n, saving at backup, 4.If first letter of backup is at EOF, memory free then return NULL. 5. We have to print data that line that we read before '\n', so save \0 at '\n'+ 1
+static char	*ft_extract(char *line)
 {
 	int		i;
 	char	*result;
@@ -65,13 +65,13 @@ static char	*ft_extract(char *line)	//1.Check \n position. 2. If you find EOF, t
 
 char	*get_next_line(int fd)
 {
-	char	*line;
-	char	*buf;
+	char		*line;
+	char		*buf;
+	static char	*backup;
 
-	static char	*backup; // value will be stackup so after	/n still we can use the value
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (0);
-	buf = (char *)calloc((BUFFER_SIZE + 1), (sizeof(char)));
+	buf = (char *)malloc((sizeof(char)) * (BUFFER_SIZE + 1));
 	if (!buf)
 		return (NULL);
 	line = ft_read_line(fd, buf, backup);
@@ -82,21 +82,3 @@ char	*get_next_line(int fd)
 	backup = ft_extract(line);
 	return (line);
 }
-
-/*
-#include <fcntl.h>
-#include <stdio.h>
-
-int	main(void)
-{
-	int		fd;
-	char	*line;
-
-	fd = 0;
-	fd = open("./bible.txt", O_RDONLY);
-	line = get_next_line(fd);
-	printf("%p\n", line);
-	printf("%s", line);
-	return (0);
-}
-*/
